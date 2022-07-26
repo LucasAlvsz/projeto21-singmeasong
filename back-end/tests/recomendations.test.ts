@@ -38,6 +38,44 @@ describe("POST recomendations", () => {
 		})
 		expect(recomendationCreated).toHaveLength(1)
 	})
+	it("should not create a new recommendation and return status code 422", async () => {
+		const recomendationData = createNewRecomendation()
+		delete recomendationData.name
+		const response = await agent
+			.post("/recommendations")
+			.send(recomendationData)
+		expect(response.status).toBe(422)
+		const recomendationCreated = await prisma.recommendation.findMany({
+			where: { name: recomendationData.name },
+		})
+		expect(recomendationCreated).toHaveLength(0)
+	})
+	it("should not create a new recommendation and return status code 422", async () => {
+		const recomendationData = createNewRecomendation()
+		delete recomendationData.youtubeLink
+		const response = await agent
+			.post("/recommendations")
+			.send(recomendationData)
+		expect(response.status).toBe(422)
+	})
+	it("should not create a new recommendation and return status code 422", async () => {
+		const recomendationData = createNewRecomendation()
+		const response = await agent
+			.post("/recommendations")
+			.send({ ...recomendationData, invalid: "invalid" })
+		expect(response.status).toBe(422)
+		const recomendationCreated = await prisma.recommendation.findMany({
+			where: { name: recomendationData.name },
+		})
+		expect(recomendationCreated).toHaveLength(0)
+	})
+	it("should not create a new recommendation and return status code 422", async () => {
+		const recomendationData = undefined
+		const response = await agent
+			.post("/recommendations")
+			.send(recomendationData)
+		expect(response.status).toBe(422)
+	})
 })
 
 afterAll(async () => {
