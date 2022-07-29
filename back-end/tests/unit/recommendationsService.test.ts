@@ -1,6 +1,7 @@
 import { recommendationRepository } from "../../src/repositories/recommendationRepository"
 import { recommendationService } from "../../src/services/recommendationsService"
 import {
+	createAmount,
 	createId,
 	createRecommendationBody,
 	createRecommendationData,
@@ -118,7 +119,7 @@ describe("recommendation service test suite", () => {
 			expect(promise).rejects.toHaveProperty("type", "not_found")
 		})
 	})
-	describe("Get recommendations", () => {
+	describe("Get all recommendations", () => {
 		it("should return a list of recommendations", async () => {
 			const recommendations = [
 				createRecommendationData(),
@@ -129,6 +130,20 @@ describe("recommendation service test suite", () => {
 				"findAll"
 			).mockResolvedValueOnce(recommendations)
 			const result = await recommendationService.get()
+			expect(result).toEqual(recommendations)
+		})
+	})
+	describe("Get top recommendations", () => {
+		it("should return a list of top recommendations", async () => {
+			const recommendations = [
+				createRecommendationData(),
+				createRecommendationData(),
+			]
+			jest.spyOn(
+				recommendationRepository,
+				"getAmountByScore"
+			).mockResolvedValueOnce(recommendations)
+			const result = await recommendationService.getTop(2)
 			expect(result).toEqual(recommendations)
 		})
 	})

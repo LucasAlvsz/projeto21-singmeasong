@@ -11,7 +11,7 @@ const createId = () => {
 	return parseInt(faker.random.numeric())
 }
 
-const createScore = () => {
+const createAmount = () => {
 	return parseInt(faker.random.numeric())
 }
 
@@ -21,13 +21,13 @@ const createRecommendationData = () => {
 		id: createId(),
 		name,
 		youtubeLink,
-		score: createScore(),
+		score: createAmount(),
 	}
 }
 
 export {
 	createRecommendationBody,
 	createId,
-	createScore,
+	createAmount,
 	createRecommendationData,
 }
