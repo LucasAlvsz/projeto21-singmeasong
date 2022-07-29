@@ -2,8 +2,9 @@ import { recommendationRepository } from "../../src/repositories/recommendationR
 import { recommendationService } from "../../src/services/recommendationsService"
 import {
 	createId,
+	createRecommendationBody,
 	createRecommendationData,
-} from "./factories/recommendationFactory"
+} from "./factories/recommendationServiceFactory"
 
 describe("recommendation service test suite", () => {
 	describe("Create a new recommendation", () => {
@@ -17,8 +18,8 @@ describe("recommendation service test suite", () => {
 				"create"
 			).mockResolvedValueOnce(null)
 
-			const recommendationData = createRecommendationData()
-			await recommendationService.insert(recommendationData)
+			const recommendationBody = createRecommendationBody()
+			await recommendationService.insert(recommendationBody)
 			expect(recommendationRepository.findByName).toBeCalled()
 			expect(recommendationRepository.create).toBeCalled()
 		})
@@ -28,8 +29,8 @@ describe("recommendation service test suite", () => {
 				"findByName"
 			).mockResolvedValueOnce(true as any)
 
-			const recommendationData = createRecommendationData()
-			const promise = recommendationService.insert(recommendationData)
+			const recommendationBody = createRecommendationBody()
+			const promise = recommendationService.insert(recommendationBody)
 			expect(promise).rejects.toHaveProperty("type", "conflict")
 		})
 	})
@@ -98,6 +99,37 @@ describe("recommendation service test suite", () => {
 			expect(recommendationRepository.find).toBeCalled()
 			expect(recommendationRepository.updateScore).toBeCalled()
 			expect(recommendationRepository.remove).toBeCalled()
+		})
+	})
+	describe("Get recommendation by id", () => {
+		it("should return a recommendation if id is valid", async () => {
+			const recommendation = createRecommendationData()
+			jest.spyOn(recommendationRepository, "find").mockResolvedValueOnce(
+				recommendation
+			)
+			const result = await recommendationService.getById(createId())
+			expect(result).toEqual(recommendation)
+		})
+		it("should not return a recommendation if id is invalid", async () => {
+			jest.spyOn(recommendationRepository, "find").mockResolvedValueOnce(
+				null
+			)
+			const promise = recommendationService.getById(createId())
+			expect(promise).rejects.toHaveProperty("type", "not_found")
+		})
+	})
+	describe("Get recommendations", () => {
+		it("should return a list of recommendations", async () => {
+			const recommendations = [
+				createRecommendationData(),
+				createRecommendationData(),
+			]
+			jest.spyOn(
+				recommendationRepository,
+				"findAll"
+			).mockResolvedValueOnce(recommendations)
+			const result = await recommendationService.get()
+			expect(result).toEqual(recommendations)
 		})
 	})
 })
