@@ -1,10 +1,10 @@
 import supertest from "supertest"
 
-import app from "../src/app.js"
-import prisma from "../src/database.js"
+import app from "../../src/app.js"
+import prisma from "../../src/database.js"
 import { createNewRecomendation } from "./factories/recomendationsFactory.js"
 import {
-	createScnearioAlreadyExistsRecomendation,
+	createScnearioAlreadyExistsRecommendation,
 	deleteAllData,
 } from "./factories/scnearioFactory.js"
 
@@ -27,18 +27,18 @@ describe("POST recomendations", () => {
 		expect(recomendationCreated).toBeDefined()
 	})
 	it("should not create a new recommendation if it already exists", async () => {
-		const recomendationData =
-			await createScnearioAlreadyExistsRecomendation()
+		const { name, youtubeLink } =
+			await createScnearioAlreadyExistsRecommendation()
 		const response = await agent
 			.post("/recommendations")
-			.send(recomendationData)
+			.send({ name, youtubeLink })
 		expect(response.status).toBe(409)
 		const recomendationCreated = await prisma.recommendation.findMany({
-			where: { name: recomendationData.name },
+			where: { name },
 		})
 		expect(recomendationCreated).toHaveLength(1)
 	})
-	//FIXME
+
 	it("should not create a new recommendation and return status code 422", async () => {
 		const recomendationData = createNewRecomendation()
 		delete recomendationData.name
@@ -77,9 +77,56 @@ describe("POST recomendations", () => {
 			.send(recomendationData)
 		expect(response.status).toBe(422)
 	})
-	//FIXME
+	it("should not create a new recommendation and return status code 422", async () => {
+		const recomendationData = createNewRecomendation()
+		recomendationData.youtubeLink = "invalid"
+		const response = await agent
+			.post("/recommendations")
+			.send(recomendationData)
+		expect(response.status).toBe(422)
+	})
 })
 
+describe("POST upvote", () => {
+	it("should upvote a recomendation", async () => {
+		const { id } = await createScnearioAlreadyExistsRecommendation()
+		const response = await agent.post(`/recommendations/${id}/upvote`)
+		const recomendation = await prisma.recommendation.findUnique({
+			where: { id },
+		})
+		expect(recomendation.score).toBe(1)
+		expect(response.status).toBe(200)
+	})
+	it("should not upvote a recomendation if it does not exist", async () => {
+		const response = await agent.post("/recommendations/123/upvote")
+		expect(response.status).toBe(404)
+	})
+})
+
+describe("POST downvote", () => {
+	it("should downvote a recomendation", async () => {
+		const { id } = await createScnearioAlreadyExistsRecommendation()
+		const response = await agent.post(`/recommendations/${id}/downvote`)
+		const recomendation = await prisma.recommendation.findUnique({
+			where: { id },
+		})
+		expect(recomendation.score).toBe(-1)
+		expect(response.status).toBe(200)
+	})
+	it("should not downvote a recomendation if it does not exist", async () => {
+		const response = await agent.post("/recommendations/123/downvote")
+		expect(response.status).toBe(404)
+	})
+	it("must remove a recommendation if the score is less than -5", async () => {
+		const { id } = await createScnearioAlreadyExistsRecommendation(-6)
+		const response = await agent.post(`/recommendations/${id}/downvote`)
+		const recomendation = await prisma.recommendation.findUnique({
+			where: { id },
+		})
+		expect(recomendation).toBeNull()
+		expect(response.status).toBe(200)
+	})
+})
 afterAll(async () => {
 	await prisma.$disconnect()
 })
