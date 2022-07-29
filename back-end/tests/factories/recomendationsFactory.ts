@@ -4,7 +4,7 @@ import { CreateRecommendationData } from "../../src/services/recommendationsServ
 const createNewRecomendation = (): CreateRecommendationData => {
 	return {
 		name: faker.music.songName(),
-		youtubeLink: faker.internet.url(),
+		youtubeLink: "https://www.youtube.com/watch?v=chwyjJbcs1Y"
 	}
 }
 

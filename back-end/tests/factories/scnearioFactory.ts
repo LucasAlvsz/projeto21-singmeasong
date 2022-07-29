@@ -1,5 +1,5 @@
 import { createNewRecomendation } from "./recomendationsFactory"
-import { prisma } from "../../src/database"
+import prisma from "../../src/database"
 
 const createScnearioAlreadyExistsRecomendation = async () => {
 	const { name, youtubeLink } = createNewRecomendation()

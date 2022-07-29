@@ -1,7 +1,7 @@
 import supertest from "supertest"
 
 import app from "../src/app.js"
-import { prisma } from "../src/database.js"
+import prisma from "../src/database.js"
 import { createNewRecomendation } from "./factories/recomendationsFactory.js"
 import {
 	createScnearioAlreadyExistsRecomendation,
@@ -30,7 +30,7 @@ describe("POST recomendations", () => {
 		const recomendationData =
 			await createScnearioAlreadyExistsRecomendation()
 		const response = await agent
-			.post("/recomendations")
+			.post("/recommendations")
 			.send(recomendationData)
 		expect(response.status).toBe(409)
 		const recomendationCreated = await prisma.recommendation.findMany({
@@ -38,6 +38,7 @@ describe("POST recomendations", () => {
 		})
 		expect(recomendationCreated).toHaveLength(1)
 	})
+	//FIXME
 	it("should not create a new recommendation and return status code 422", async () => {
 		const recomendationData = createNewRecomendation()
 		delete recomendationData.name
@@ -76,6 +77,7 @@ describe("POST recomendations", () => {
 			.send(recomendationData)
 		expect(response.status).toBe(422)
 	})
+	//FIXME
 })
 
 afterAll(async () => {
