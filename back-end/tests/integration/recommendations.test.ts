@@ -140,7 +140,7 @@ describe("GET recommendations", () => {
 		expect(response.status).toBe(200)
 		expect(response.body).toHaveLength(10)
 	})
-	it("should return a empty list if no recommendations", async () => {
+	it("should return an empty list if no recommendations", async () => {
 		const response = await agent.get("/recommendations")
 		expect(response.status).toBe(200)
 		expect(response.body).toEqual([])
@@ -154,9 +154,38 @@ describe("GET recommendations", () => {
 			expect(response.status).toBe(200)
 			expect(response.body).toEqual(recommendationData[0])
 		})
-		it("should not return a recomendation if id does not exist", async () => {
+		it("should not return a recommendation if id does not exist", async () => {
 			const response = await agent.get("/recommendations/123")
 			expect(response.status).toBe(404)
+		})
+	})
+	describe("GET random recommendations", () => {
+		it("should return a random recommendation", async () => {
+			const recommendationData =
+				await createScnearioAlreadyExistsRecommendation(1)
+			const response = await agent.get("/recommendations/random")
+			expect(response.status).toBe(200)
+			expect(response.body).toEqual(recommendationData[0])
+		})
+		it("should not return a recommendation if none exists", async () => {
+			const response = await agent.get("/recommendations/random")
+			expect(response.status).toBe(404)
+		})
+	})
+	describe("GET top recommendations", () => {
+		it("should return a list of top recommendations", async () => {
+			await createScnearioAlreadyExistsRecommendation(10, 200)
+			await createScnearioAlreadyExistsRecommendation(10, 100)
+			const response = await agent.get("/recommendations/top/10")
+
+			expect(response.status).toBe(200)
+			expect(response.body).toHaveLength(10)
+			expect(response.body).not.toHaveProperty("score", 100)
+		})
+		it("should return an empty list of top recommendations if none exist", async () => {
+			const response = await agent.get("/recommendations/top/10")
+			expect(response.status).toBe(200)
+			expect(response.body).toEqual([])
 		})
 	})
 })
