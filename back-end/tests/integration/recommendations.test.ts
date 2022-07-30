@@ -176,8 +176,8 @@ describe("GET recommendations", () => {
 		it("should return a list of top recommendations", async () => {
 			await createScnearioAlreadyExistsRecommendation(10, 200)
 			await createScnearioAlreadyExistsRecommendation(10, 100)
+			
 			const response = await agent.get("/recommendations/top/10")
-
 			expect(response.status).toBe(200)
 			expect(response.body).toHaveLength(10)
 			expect(response.body).not.toHaveProperty("score", 100)
