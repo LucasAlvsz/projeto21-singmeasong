@@ -7,6 +7,12 @@ import {
 	createRecommendationData,
 } from "./factories/recommendationServiceFactory"
 
+beforeEach(() => {
+	jest.clearAllMocks()
+})
+
+jest.mock("../../src/repositories/recommendationRepository")
+
 describe("recommendation service test suite", () => {
 	describe("Create a new recommendation", () => {
 		it("should create a new recommendation", async () => {
@@ -145,6 +151,48 @@ describe("recommendation service test suite", () => {
 			).mockResolvedValueOnce(recommendations)
 			const result = await recommendationService.getTop(2)
 			expect(result).toEqual(recommendations)
+		})
+	})
+	describe("Get random recommendation", () => {
+		it("should return a random recommendation with 10 or more of score", async () => {
+			const recommendations = [
+				createRecommendationData(),
+				createRecommendationData(),
+			]
+			jest.spyOn(Math, "random").mockImplementation(() => {
+				return 0.5
+			})
+			jest.spyOn(
+				recommendationRepository,
+				"findAll"
+			).mockResolvedValueOnce(recommendations)
+			const result = await recommendationService.getRandom()
+			expect(result).toEqual(recommendations[1])
+		})
+		it("should return a random recommendation between -5 and 10 score", async () => {
+			const recommendations = [
+				createRecommendationData(),
+				createRecommendationData(),
+			]
+			jest.spyOn(Math, "random").mockImplementation(() => {
+				return 0.8
+			})
+			jest.spyOn(
+				recommendationRepository,
+				"findAll"
+			).mockResolvedValueOnce(recommendations)
+			const result = await recommendationService.getRandom()
+			expect(result).toEqual(recommendations[1])
+		})
+		it("should not return a random recommendation if there are no recommendations", async () => {
+			jest.spyOn(Math, "random").mockImplementation(() => {
+				return 0.5
+			})
+			jest.spyOn(recommendationRepository, "findAll").mockResolvedValue(
+				[]
+			)
+			const promise = recommendationService.getRandom()
+			expect(promise).rejects.toHaveProperty("type", "not_found")
 		})
 	})
 })

@@ -10,7 +10,7 @@
 		"prisma:migrate": "prisma migrate dev",
 		"test": "jest --i --coverage",
 		"test:unit": "clear && jest --verbose -i -e --coverage --testPathPattern=tests/unit",
-		"test:integration": "jest --i --verbose --coverage --testPathPattern=tests/integration"
+		"test:integration": "clear && jest --i --verbose --coverage --testPathPattern=tests/integration"
 	},
 	"keywords": [],
 	"author": "",
