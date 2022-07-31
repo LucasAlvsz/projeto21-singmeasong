@@ -133,8 +133,32 @@ describe("Vote a recommendation suit test", () => {
 	})
 })
 
-describe("Get recommendations suit test", () => {
-	describe("Get all recommendations suit test", () => {})
+describe("Get's recommendations suit test", () => {
+	describe("Get recommendations suit test", () => {
+		it("should only get 10 recommendations", () => {
+			cy.createRecommendation(15)
+			cy.intercept("GET", `${API_BASE_URL}/recommendations`).as(
+				"getRecommendations"
+			)
+			cy.visit("http://localhost:3000/")
+			cy.wait("@getRecommendations").then(({ response }) => {
+				expect(response.statusCode).equal(200)
+				expect(response.body.length).equal(10)
+				cy.get("#no-recommendations").should("not.exist")
+			})
+		})
+		it("should not get any recommendations if there are no recommendations", () => {
+			cy.intercept("GET", `${API_BASE_URL}/recommendations`).as(
+				"getRecommendations"
+			)
+			cy.visit("http://localhost:3000/")
+			cy.wait("@getRecommendations").then(({ response }) => {
+				expect(response.statusCode).equal(200)
+				expect(response.body.length).equal(0)
+				cy.get("#no-recommendations").should("exist")
+			})
+		})
+	})
 	describe("Get a recommendation by id suit test", () => {})
 	describe("Get a random recommendation suit test", () => {})
 	describe("Get the top recommendations suit test", () => {})
