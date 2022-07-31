@@ -5,7 +5,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"dev": "nodemon src/server.ts",
+		"dev": "dotenv -e .env.test nodemon src/server.ts",
 		"prisma:reset": "prisma migrate reset --force",
 		"prisma:migrate": "prisma migrate dev",
 		"test": "jest --i --coverage",
