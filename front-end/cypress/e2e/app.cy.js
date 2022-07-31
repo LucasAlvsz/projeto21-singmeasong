@@ -159,7 +159,44 @@ describe("Get's recommendations suit test", () => {
 			})
 		})
 	})
-	describe("Get a recommendation by id suit test", () => {})
-	describe("Get a random recommendation suit test", () => {})
-	describe("Get the top recommendations suit test", () => {})
+	describe("Get a random recommendation suit test", () => {
+		it("should get a random recommendation", () => {
+			cy.createRecommendation(5)
+			cy.intercept("GET", `${API_BASE_URL}/recommendations/random`).as(
+				"getRecommendations"
+			)
+			cy.visit("http://localhost:3000/random")
+			cy.wait("@getRecommendations").then(({ response }) => {
+				expect(response.statusCode).equal(200)
+				expect(response.body).not.equal(null)
+				cy.get("#no-recommendations").should("not.exist")
+			})
+		})
+	})
+	describe("Get the top recommendations suit test", () => {
+		it("should get the top 10 recommendations", () => {
+			cy.createRecommendation(5, 100)
+			cy.createRecommendation(5, 200)
+			cy.createRecommendation(5)
+			cy.intercept("GET", `${API_BASE_URL}/recommendations/top/10`).as(
+				"getRecommendations"
+			)
+			cy.visit("http://localhost:3000/top")
+			cy.wait("@getRecommendations").then(({ response }) => {
+				expect(response.statusCode).equal(200)
+				expect(response.body.length).equal(10)
+				cy.get("#no-recommendations").should("not.exist")
+				cy.get("article:nth-of-type(1)>div:nth-child(3)").then(div =>
+					cy
+						.wait(500)
+						.then(() => expect(parseInt(div.text())).equal(200))
+				)
+				cy.get("article:nth-of-type(6)>div:nth-child(3)").then(div =>
+					cy
+						.wait(500)
+						.then(() => expect(parseInt(div.text())).equal(100))
+				)
+			})
+		})
+	})
 })
