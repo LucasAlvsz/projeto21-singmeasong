@@ -115,6 +115,7 @@ describe("recommendation service test suite", () => {
 				recommendation
 			)
 			const result = await recommendationService.getById(createId())
+			expect(recommendationRepository.find).toBeCalled()
 			expect(result).toEqual(recommendation)
 		})
 		it("should not return a recommendation if id is invalid", async () => {
@@ -136,6 +137,7 @@ describe("recommendation service test suite", () => {
 				"findAll"
 			).mockResolvedValueOnce(recommendations)
 			const result = await recommendationService.get()
+			expect(recommendationRepository.findAll).toBeCalled()
 			expect(result).toEqual(recommendations)
 		})
 	})
@@ -150,6 +152,7 @@ describe("recommendation service test suite", () => {
 				"getAmountByScore"
 			).mockResolvedValueOnce(recommendations)
 			const result = await recommendationService.getTop(2)
+			expect(recommendationRepository.getAmountByScore).toBeCalled()
 			expect(result).toEqual(recommendations)
 		})
 	})
@@ -167,6 +170,7 @@ describe("recommendation service test suite", () => {
 				"findAll"
 			).mockResolvedValueOnce(recommendations)
 			const result = await recommendationService.getRandom()
+			expect(recommendationRepository.findAll).toBeCalled()
 			expect(result).toEqual(recommendations[1])
 		})
 		it("should return a random recommendation between -5 and 10 score", async () => {
@@ -182,6 +186,7 @@ describe("recommendation service test suite", () => {
 				"findAll"
 			).mockResolvedValueOnce(recommendations)
 			const result = await recommendationService.getRandom()
+			expect(recommendationRepository.findAll).toBeCalled()
 			expect(result).toEqual(recommendations[1])
 		})
 		it("should not return a random recommendation if there are no recommendations", async () => {
