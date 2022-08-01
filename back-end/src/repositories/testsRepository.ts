@@ -7,7 +7,7 @@ const insert = async (length = 1, score = 0) => {
 	)
 	const result = Promise.all(
 		recomendations.map(
-			async rec => await prisma.recommendation.create({ data: rec })
+			async (rec) => await prisma.recommendation.create({ data: rec })
 		)
 	)
 	return result
