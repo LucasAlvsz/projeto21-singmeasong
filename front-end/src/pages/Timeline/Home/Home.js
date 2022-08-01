@@ -15,7 +15,7 @@ export default function Home() {
 		creatingRecommendationError,
 	} = useCreateRecommendation()
 
-	const handleCreateRecommendation = async recommendation => {
+	const handleCreateRecommendation = async (recommendation) => {
 		await createRecommendation({
 			name: recommendation.name,
 			youtubeLink: recommendation.link,
@@ -40,7 +40,7 @@ export default function Home() {
 				disabled={loadingCreatingRecommendation}
 				onCreateNewRecommendation={handleCreateRecommendation}
 			/>
-			{recommendations.map(recommendation => (
+			{recommendations.map((recommendation) => (
 				<Recommendation
 					key={recommendation.id}
 					{...recommendation}
